@@ -35,22 +35,29 @@ Benefits of contianers
     - Changes in the volume on the host side or container are in effect to the both sides.
     - The volume location is unknown and is managed by `docker volume` command.
     - Great for storing data that should be persisted but not necessary to be edited by the developer.
+    - Volumes can improve the performance of a container for data access.
       - Anonymous:
+        - Created per single container. Not sharable between containers
         - Is specified by the directory path inside the container filesystem (e.g., `/app/data`)
         - volumes are removed automatically, when a container is removed.
         - Per container start, a new anonymous volume is created and previous one is left.
         - Unused anonymous volumes can be removed by `docker volume rm <volume_name>` or `docker volume prune`
+        - Can be used to prioritize container-internal paths over the external paths (e.g., node_modules).
       - Named: A volume that is
+        - Not tied to a container. Can be accessed/shared by multiple containers.
         - Is specified by the directory path inside the container filesystem and a name divided by a colon (e.g., `myData:/app/data`).
-        - Persist even on container removal.
+        - Persist even on container removal. Can be reused.
         - Won't be recreated on container (re)start.
   - Bind Mount (manged by user): When you use a bind mount, a file or directory on the host machine is mounted into a container.
     - The file or directory is referenced by its full path on the host machine (e.g. `/Users/iman/code/fullstack-playbook/todo-app/todo-be:/app`).
     - Read-Writeable
+    - Not tied to a container. Can be accessed/shared by multiple containers.
     - The file or directory does not need to exist on the Docker host already.
     - It is created on demand if it does not yet exist.
     - Bind mounts are very performant, but they rely on the host machine’s filesystem having a specific directory structure available.
     - Best fit for persistent and editable data.
+    - Never shown under `docker volume ls` command, since it is not manged by Docker.
+    - Bind mount can be read-only to prevent the container to change it. Can be set by `:ro` at the end of the path.
 
 - Data types in Docker
   - Application (source code + dependencies + runtime) => Stored in an image Read-Only layer
