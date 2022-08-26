@@ -35,6 +35,10 @@ Benefits of contianers
     - Changes in the volume on the host side or container are in effect to the both sides.
     - The volume location is unknown and is managed by `docker volume` command.
     - Great for storing data that should be persisted but not necessary to be edited by the developer.
+    - Data types in Docker
+      - Application (source code + dependencies + runtime) => Stored in an image Read-Only layer
+      - Temporary app data (app state, temp data, etc) => Stored in a container's memory or filesystem and is Read-Writeable. Stopping a container won't delete the data store in container's filesystem, but removing the container will delete that.
+      - Persistent app data (user data) => Stored in filesystem and database in a container and volumes
     - Volumes can improve the performance of a container for data access.
       - Anonymous:
         - Created per single container. Not sharable between containers
@@ -58,11 +62,10 @@ Benefits of contianers
     - Best fit for persistent and editable data.
     - Never shown under `docker volume ls` command, since it is not manged by Docker.
     - Bind mount can be read-only to prevent the container to change it. Can be set by `:ro` at the end of the path.
-
-- Data types in Docker
-  - Application (source code + dependencies + runtime) => Stored in an image Read-Only layer
-  - Temporary app data (app state, temp data, etc) => Stored in a container's memory or filesystem and is Read-Writeable. Stopping a container won't delete the data store in container's filesystem, but removing the container will delete that.
-  - Persistent app data (user data) => Stored in filesystem and database in a container and volumes
+  - Network communication types
+    - container-to-host: instead of using `localhost`, use `host.docker.internal`.
+    - container-to-container: 
+    - container-to-public(Internet): It works out of the box.
 
 
 
