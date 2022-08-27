@@ -130,3 +130,17 @@ docker cp <container-name/container-id>:<file-path> <local-path>
 
 ```
 
+```bash
+# Lists docker compose commands
+docker compose --help 
+
+# Building the images 
+docker compose build
+
+# Create and start containers (images if not built yet)
+docker compose up
+
+# Stop and remove containers, networks
+# If plan you want to remove containers add -v/--volumes
+docker compose down
+```
