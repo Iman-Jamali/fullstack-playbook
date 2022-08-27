@@ -63,9 +63,19 @@ Benefits of contianers
     - Never shown under `docker volume ls` command, since it is not manged by Docker.
     - Bind mount can be read-only to prevent the container to change it. Can be set by `:ro` at the end of the path.
   - Network communication types
-    - container-to-host: instead of using `localhost`, use `host.docker.internal`.
-    - container-to-container: 
     - container-to-public(Internet): It works out of the box.
+    - container-to-host: instead of using `localhost`, use special address `host.docker.internal`.
+    - container-to-container:
+      - Create two separate containers (on their own default networks) and one connect to another by inspecting ip of the target container and put that in the request address.
+      - Create a network and have two or more container running inside that network. In this case containers can use their names as addresses to communicate to each other. Docker will resolve that name internally and replace it with the correct ip address.
+      - Docker network has a driver that specifies the behavior of the network. By deafult, networks use `bridge` as driver. Other types of drives include:
+        - host: For standalone containers, isolation between container and host system is removed (i.e. they share localhost as a network)
+        - overlay: Multiple Docker daemons (i.e. Docker running on different machines) are able to connect with each other. Only works in "Swarm" mode which is a dated / almost deprecated way of connecting multiple containers
+        - macvlan: You can set a custom MAC address to a container - this address can then be used for communication with that container
+        - none: All networking is disabled.
+        - Third-party plugins: You can install third-party plugins which then may add all kinds of behaviors and functionalities
+
+
 
 
 
