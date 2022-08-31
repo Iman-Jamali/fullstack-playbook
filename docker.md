@@ -76,8 +76,21 @@ Benefits of contianers
         - Third-party plugins: You can install third-party plugins which then may add all kinds of behaviors and functionalities
 
 
+## Docker Utility container
+A docker utility container can help you setup your initial project without needing to have the tools/depenceis installed on your machine.
+
+### Node
+Use this command to run a node container and bind the `/app` directory inside that container to your current working directory.
+
+```bash
+  docker run -it --rm -v $(pwd):/app node:16.16.0-buster bash
+```
 
 
+## [Dockerignore](https://docs.docker.com/engine/reference/builder/#dockerignore-file)
+To increase the build’s performance, exclude the unnecessary files and directories. The indicated files and directories will be excluded during the image build time (COPY command).
+
+For example, for a Node project, you will ignore `node_modules` directory.
 
 
 ## [Docker commands](https://docs.docker.com/engine/reference/run/)

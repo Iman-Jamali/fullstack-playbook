@@ -1,9 +1,8 @@
-# syntax=docker/dockerfile:1
 FROM node:16.16.0-buster
 WORKDIR /app
 COPY ["package.json", "package-lock.json*", "./"]
 RUN npm install --development
 COPY . .
 RUN npm run build
-EXPOSE 3000
+EXPOSE 5001
 CMD [ "npm", "run", "start:dev"]
