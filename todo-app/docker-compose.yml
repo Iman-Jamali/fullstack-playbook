@@ -10,6 +10,8 @@ services:
     volumes: 
       - ./todo-api:/app
       - /app/node_modules
+    depends_on:
+      - todo-db
   todo-fe:
     container_name: todo-fe
     build:
@@ -20,4 +22,17 @@ services:
     volumes: 
       - ./todo-fe:/app
       - /app/node_modules
+  todo-db:
+    image: postgres:14
+    container_name: todo-db
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - todo-db-data:/var/lib/postgresql/data:cached
+volumes:
+  todo-db-data:
     

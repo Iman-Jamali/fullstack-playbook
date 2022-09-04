@@ -1,0 +1,61 @@
+@baseUrl = http://localhost:5001/api/v1
+###
+
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "u1.l@mail.com",
+  "password": "password1aB"
+}
+###
+
+POST {{baseUrl}}/todos
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.accessToken}}
+
+{
+  "title": "t1 u1",
+  "description": "d1 u1"
+}
+
+###
+
+GET  {{baseUrl}}/todos
+Authorization: Bearer {{login.response.body.accessToken}}
+
+###
+
+GET  {{baseUrl}}/todos/9149c540-3caa-401c-a604-8afe9e49139d
+Authorization: Bearer {{login.response.body.accessToken}}
+
+###
+
+PATCH  {{baseUrl}}/todos/9149c540-3caa-401c-a604-8afe9e49139d
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.accessToken}}
+
+{
+  # "title": null
+  # "title": 1
+  # "title": ""
+  # "title": "t1 u"
+
+  # "description": null
+  # "description": 1
+  # "description": ""
+  # "description": "d1 uu"
+
+
+  # "checked": null
+  # "checked": 1
+  # "checked": ""
+  # "checked": true
+}
+
+###
+
+DELETE {{baseUrl}}/todos/398de3ab-055e-40a5-82db-0d721bd888e4
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.accessToken}}

@@ -52,6 +52,7 @@ Benefits of contianers
         - Is specified by the directory path inside the container filesystem and a name divided by a colon (e.g., `myData:/app/data`).
         - Persist even on container removal. Can be reused.
         - Won't be recreated on container (re)start.
+        - Named volumes need to be defined under top-level `volumes` block in `docker compose` file
   - Bind Mount (manged by user): When you use a bind mount, a file or directory on the host machine is mounted into a container.
     - The file or directory is referenced by its full path on the host machine (e.g. `/Users/iman/code/fullstack-playbook/todo-app/todo-be:/app`).
     - Read-Writeable
@@ -75,6 +76,13 @@ Benefits of contianers
         - none: All networking is disabled.
         - Third-party plugins: You can install third-party plugins which then may add all kinds of behaviors and functionalities
 
+## [Volumes configuration](https://stackoverflow.com/questions/43844639/how-do-i-add-cached-or-delegated-into-a-docker-compose-yml-volumes-list)
+The purpose of using volumes configuration on docker is to share data between the host and the docker container and ensure data consistency between both (What happens in A(host/container) is represented in B(host/container) and vice versa) . The mounted volume is "part" of the container and relevant. The common usage is to store shared data backup both in container and on file system in machine. If the container is removed, volume still exists and is independent of container state it will be reused and loaded from last persisted state.
+
+- Use `cached`: when the host performs changes, the container is in read only mode.
+- Use `delegated`: when docker container performs changes, host is in read only mode.
+- Use `default`: When both container and host actively and continuously perform changes on data.
+- Ensure you use an updated docker-compose and docker version on your machine
 
 ## Docker Utility container
 A docker utility container can help you setup your initial project without needing to have the tools/depenceis installed on your machine.

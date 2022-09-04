@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.formAction {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-around;
+}

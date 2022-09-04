@@ -1,0 +1,21 @@
+@baseUrl = http://localhost:5001/api/v1
+###
+
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "u1.l@mail.com",
+  "password": "password1aB"
+}
+
+###
+
+GET {{baseUrl}}/users
+Authorization: Bearer {{login.response.body.accessToken}}
+
+###
+
+GET {{baseUrl}}/users/747f2eef-124c-45af-bcc7-c91095022c9e
+Authorization: Bearer {{login.response.body.accessToken}}

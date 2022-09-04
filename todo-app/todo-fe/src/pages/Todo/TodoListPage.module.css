@@ -1,0 +1,11 @@
+.fab {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+}
+
+.itemsContainer {
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  flex-direction: row;
+}
