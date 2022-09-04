@@ -4,7 +4,6 @@ import styles from "./Layout.module.css";
 
 const Layout = () => {
   const { logout, isLoggedIn } = useAuth();
-  console.log(isLoggedIn);
   
   return (
     <main className={"App" + " " + styles.container}>

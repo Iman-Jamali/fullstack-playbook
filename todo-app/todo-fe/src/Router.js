@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import useAuth from "./hooks/useAuth";
 import TodoListPage from "./pages/Todo/TodoListPage";
 import TodoItemPage from "./pages/Todo/TodoItemPage/TodoItemPage";
@@ -43,6 +43,9 @@ const Router = () => {
               <Route path={"create"} element={<TodoItemPage />} />
             </Route>
           </Route>
+
+          {/* Redirects */}
+          <Route path={"/"} element={<Navigate to='/todos' replace />} />
 
           <Route path='*' element={<NotFound />} />
         </Route>
