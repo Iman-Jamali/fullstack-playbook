@@ -63,6 +63,7 @@ Benefits of contianers
     - Best fit for persistent and editable data.
     - Never shown under `docker volume ls` command, since it is not manged by Docker.
     - Bind mount can be read-only to prevent the container to change it. Can be set by `:ro` at the end of the path.
+    - Bind mounts are for development only. Don't use them in production.
   - Network communication types
     - container-to-public(Internet): It works out of the box.
     - container-to-host: instead of using `localhost`, use special address `host.docker.internal`.

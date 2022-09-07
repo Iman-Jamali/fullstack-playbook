@@ -3,10 +3,10 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix(process.env.TODO_API_PREFIX);
   app.enableCors({
-    origin: ['http://localhost:3000'],
+    origin: [`${process.env.TODO_FE_HOST}:${process.env.TODO_FE_PORT}`],
   });
-  await app.listen(5001);
+  await app.listen(3000);
 }
 bootstrap();
