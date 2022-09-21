@@ -4,15 +4,16 @@ services:
     container_name: todo-api
     build:
       context: ./todo-api
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.local
     ports:
-      - ${TODO_API_PORT}:3000
+      - ${TODO_API_PORT}:${TODO_API_PORT}
     volumes: 
       - ./todo-api:/app
       - /app/node_modules
     depends_on:
       - todo-db
     environment:
+      NODE_ENV: ${NODE_ENV}
       TODO_DB_POSTGRES_DATABASE: ${TODO_DB_POSTGRES_DATABASE}
       TODO_DB_POSTGRES_USER: ${TODO_DB_POSTGRES_USER}
       TODO_DB_POSTGRES_PASSWORD: ${TODO_DB_POSTGRES_PASSWORD}
@@ -26,11 +27,11 @@ services:
     container_name: todo-fe
     build:
       context: ./todo-fe
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.local
     environment:
       REACT_APP_TODO_API_BASE_URL: ${TODO_API_HOST}:${TODO_API_PORT}${TODO_API_PREFIX}
       REACT_APP_JWT_SECRET: ${TODO_API_JWT_SECRET}
-      NODE_ENV: ${NODE_ENV:-development}
+      NODE_ENV: ${NODE_ENV:-local}
     ports: 
       - ${TODO_FE_PORT}:3000
     volumes: 

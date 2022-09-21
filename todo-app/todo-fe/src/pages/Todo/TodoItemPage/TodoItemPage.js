@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axiosPrivate from "../../../axios";
-import config from "../../../shared/config";
 import styles from "./TodoItemPage.module.css";
 import { checkValidation } from "../../../shared/utils";
 
@@ -46,7 +45,7 @@ const TodoItemPage = () => {
       (async () => {
         try {
           const todo = await axiosPrivate.get(
-            `${config.apiBaseURL}/todos/${todoId}`
+            `todos/${todoId}`
           );
           setForm({
             ...form,

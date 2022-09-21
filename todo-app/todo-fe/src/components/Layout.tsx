@@ -6,7 +6,7 @@ const Layout = () => {
   const { logout, isLoggedIn } = useAuth();
   
   return (
-    <main className={"App" + " " + styles.container}>
+    <main className={styles.container}>
       <nav
         style={{
           borderBottom: "solid 1px",

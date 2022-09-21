@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import axiosPrivate from "../../axios";
-import config from "../../shared/config";
 import { RouteList } from "../../shared/routeList";
 import styles from "./TodoListPage.module.css";
 
@@ -12,7 +11,7 @@ const TodoListPage = () => {
   useEffect(() => {
     (async () => {
       try {
-        const todos = await axiosPrivate.get(`${config.apiBaseURL}/todos`);
+        const todos = await axiosPrivate.get(`todos`);
         const sortedTodoItems = todos.sort((el1, el2) =>
           el2.updatedAt.localeCompare(el1.updatedAt)
         );

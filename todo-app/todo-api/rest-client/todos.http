@@ -1,4 +1,5 @@
-@baseUrl = http://localhost:5001/api/v1
+# @baseUrl = http://localhost:5001/api/v1
+@baseUrl = http://todo-app-load-balancer-658959564.us-west-2.elb.amazonaws.com/api/v1
 ###
 
 # @name login
@@ -6,7 +7,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "u1.l@mail.com",
+  "email": "u1.d@mail.com",
   "password": "password1aB"
 }
 ###
@@ -16,8 +17,8 @@ Content-Type: application/json
 Authorization: Bearer {{login.response.body.accessToken}}
 
 {
-  "title": "t1 u1",
-  "description": "d1 u1"
+  "title": "t2",
+  "description": "d2"
 }
 
 ###

@@ -22,7 +22,7 @@ const Router = () => {
         login(token, userId);
       }
     }
-  }, [isLoggedIn, token]);
+  }, [isLoggedIn, token, login]);
 
   return (
     <BrowserRouter>

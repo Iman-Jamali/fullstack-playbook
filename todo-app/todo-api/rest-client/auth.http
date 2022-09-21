@@ -1,11 +1,12 @@
 @baseUrl = http://localhost:5001/api/v1
+# @baseUrl = http://todo-app-load-balancer-658959564.us-west-2.elb.amazonaws.com/api/v1
 ###
 
 POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-  "email": "u2.l@mail.com",
+  "email": "u1.d@mail.com",
   "password": "password1aB"
 }
 

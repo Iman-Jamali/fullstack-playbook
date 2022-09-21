@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import styles from "./RegistrationPage.module.css";
 import { checkValidation } from "../../../shared/utils";
-import axios from "axios";
+import axiosPrivate from "../../../axios";
 import * as jose from "jose";
 import { Link, useNavigate } from "react-router-dom";
-import config from "../../../shared/config";
 import useAuth from "../../../hooks/useAuth";
 import { RouteList } from "../../../shared/routeList";
 
@@ -73,13 +72,10 @@ const RegistrationPage = () => {
     const password = form.password.value.trim();
     const authData = { email: email, password: password };
     try {
-      await axios.post(`${config.apiBaseURL}/auth/register`, authData);
-      const response = await axios.post(
-        `${config.apiBaseURL}/auth/login`,
-        authData
-      );
-      const decodedUserData = jose.decodeJwt(response.data.accessToken);
-      login(response.data.accessToken, decodedUserData.id);
+      await axiosPrivate.post(`auth/register`, authData);
+      const response = await axiosPrivate.post(`auth/login`, authData);
+      const decodedUserData = jose.decodeJwt(response.accessToken);
+      login(response.accessToken, decodedUserData.id);
       navigate(RouteList.Todos);
     } catch (error) {
       alert(error);
