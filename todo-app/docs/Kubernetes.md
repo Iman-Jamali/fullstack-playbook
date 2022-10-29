@@ -137,10 +137,15 @@ $ kubectl rollout history deployment/first-app --revision=3
 # Roll back a deployment to a specific version
 $ kubectl rollout undo deployment/first-app --to-revision=1
 
+# Restart a deployment
+$ kubectl rollout restart deployment <deployment-name>
 
 # How to remove deployment related resources
 $ kubectl delete service first-app
 $ kubectl delete deployment first-app
+
+# How to view logs of a pod
+$ kubectl logs <pod-name>
 ```
 
 For declarative approach you may need the [API reference of Kubernetes](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#-strong-api-overview-strong-)
@@ -162,37 +167,172 @@ State is date that is generated and used by the app which must not be lost.
   - Intermediate results derived by the app. Often stored in memory, temporary databases and files.
   In Kubernetes, both of the above data are stored in `Volumes` and it is Kubenetes that needs to be configured to add volumes to the containers.
 
-  #### Kubernetes and Volumes
+#### Kubernetes and Volumes
 
-  - Kubernetes can mount volumes to the containers
-    - Different type of volumes and drivers are supported
-      - "Local" volumes. (created on Nodes)
-      - Cloud-provider specific volumes
-    - Volumes lifetime depends on the Pod lifetime
-      - Volumes survives the container restart and the removal
-      - Volumes are removed when Pods are destroyed. 
+- At its core, a volume is a directory, possibly with some data in it, which is accessible to the containers in a pod.
+- How that directory comes to be, the medium that backs it, and the contents of it are determined by the particular volume type used.
+- To use a volume, specify the volumes to provide for the Pod in `.spec.volumes` and declare where to mount those volumes into containers in `.spec.containers[*].volumeMounts`.
+- For each container defined within a Pod, you must independently specify where to mount each volume that the container uses.
+- Volumes cannot mount within other volumes
+- A volume cannot contain a hard link to anything in a different volume
 
+- Kubernetes can mount volumes to the containers
+  - Different type of volumes and drivers are supported
+    - "Local" volumes. (created on Nodes)
+    - Cloud-provider specific volumes
+  - Volumes lifetime depends on the Pod lifetime
+    - Volumes survives the container restart and the removal
+    - Volumes are removed when Pods are destroyed.
 
-  Differences between Docker and Kubernetes volumes:
-   - Kubernetes Support different drivers and types
-   - Docker has no driver/type support
+Differences between Docker and Kubernetes volumes:
 
-   - Kubernetes volumes are not necessary persistent (survives container removal but removed by Pod removal)
-   - Docker volumes are persistent until manually cleared. (survives container removal).
+- Kubernetes Support different drivers and types
+- Docker has no driver/type support
 
+- Kubernetes volumes are not necessary persistent (survives container removal but removed by Pod removal)
+- Docker volumes are persistent until manually cleared. (survives container removal).
 
-volume types:
-- `emptyDir`: An emptyDir volume is first created when a Pod is assigned to a node, and exists as long as that Pod is running on that node. As the name says, the emptyDir volume is initially empty. All containers in the Pod can read and write the same files in the emptyDir volume, though that volume can be mounted at the same or different paths in each container. When a Pod is removed from a node for any reason, the data in the emptyDir is deleted permanently. Use cases:
-  - scratch space, such as for a disk-based merge sort
-  - checkpointing a long computation for recovery from crashes
-  - holding files that a content-manager container fetches while a webserver container serves the data
-- `hostPath`: A hostPath volume mounts a file or directory from the host node's filesystem into your Pod. This is not something that most Pods will need, but it offers a powerful escape hatch for some applications. Use cases:
- - Running a container that needs access to Docker internals; use a hostPath of `/var/lib/docker`
- - Running cAdvisor in a container; use a `hostPath` of `/sys`
- - Allowing a Pod to specify whether a given hostPath should exist prior to the Pod running, whether it should be created, and what it should exist as
+Some of the Kubernetes volume types:
 
+##### emptyDir
+
+An emptyDir volume is first created when a Pod is assigned to a node, and exists as long as that Pod is running on that node. As the name says, the emptyDir volume is initially empty. All containers in the Pod can read and write the same files in the emptyDir volume, though that volume can be mounted at the same or different paths in each container. When a Pod is removed from a node for any reason, the data in the emptyDir is deleted permanently. Use cases:
+
+- scratch space, such as for a disk-based merge sort
+- checkpointing a long computation for recovery from crashes
+- holding files that a content-manager container fetches while a webserver container serves the data
+
+Depending on your environment, emptyDir volumes are stored on whatever medium that backs the node such as disk or SSD, or network storage. However, if you set the `emptyDir.medium` field to `"Memory"`, Kubernetes mounts a tmpfs (RAM-backed filesystem) for you instead. While tmpfs is very fast, be aware that unlike disks, tmpfs is cleared on node reboot and any files you write count against your container's memory limit.
+
+> Note: If the `SizeMemoryBackedVolumes` feature gate is enabled, you can specify a size for memory backed volumes. If no size is specified, memory backed volumes are sized to 50% of the memory on a Linux host.
+
+emptyDir configuration example:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+  - image: registry.k8s.io/test-webserver
+    name: test-container
+    volumeMounts:
+    - mountPath: /cache
+      name: cache-volume
+  volumes:
+  - name: cache-volume
+    emptyDir: {}
+```
+
+##### hostPath
+
+A hostPath volume mounts a file or directory from the host node's filesystem into your Pod.
+
+This is not something that most Pods will need, but it offers a powerful escape hatch for some applications. Use cases:
+
+- Running a container that needs access to Docker internals; use a hostPath of `/var/lib/docker`
+- Running cAdvisor in a container; use a `hostPath` of `/sys`
+- Allowing a Pod to specify whether a given hostPath should exist prior to the Pod running, whether it should be created, and what it should exist as
+
+In addition to the required path property, you can optionally specify a type for a hostPath volume. Some of the supported values for `type` are:
+
+- Empty string (default) is for backward compatibility, which means that no checks will be performed before mounting the hostPath volume.
+- `DirectoryOrCreate`: If nothing exists at the given path, an empty directory will be created there as needed with permission set to 0755, having the same group and ownership with Kubelet.
+- `Directory`: A directory must exist at the given path
+- `FileOrCreate`: If nothing exists at the given path, an empty file will be created there as needed with permission set to 0644, having the same group and ownership with Kubelet.
+- `File`: A file must exist at the given path
+
+`hostPath` configuration example:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+  - image: registry.k8s.io/test-webserver
+    name: test-container
+    volumeMounts:
+    - mountPath: /test-pd
+      name: test-volume
+  volumes:
+  - name: test-volume
+    hostPath:
+      # directory location on host
+      path: /data
+      # this field is optional
+      type: Directory
+```
+
+##### secret
+
+A secret volume is used to pass sensitive information, such as passwords, to Pods. You can store secrets in the Kubernetes API and mount them as files for use by pods without coupling to Kubernetes directly. secret volumes are backed by tmpfs (a RAM-backed filesystem) so they are never written to non-volatile storage.
+
+- You must create a Secret in the Kubernetes API before you can use it.
+- A container using a Secret as a subPath volume mount will not receive Secret updates.
+
+##### configMap
+
+A ConfigMap provides a way to inject configuration data into pods. The data stored in a ConfigMap can be referenced in a volume of type configMap and then consumed by containerized applications running in a pod.
+
+- When referencing a ConfigMap, you provide the name of the ConfigMap in the volume. You can customize the path to use for a specific entry in the ConfigMap. The following configuration shows how to mount the log-config ConfigMap onto a Pod called configmap-pod:
+  - The log-config ConfigMap is mounted as a volume, and all contents stored in its log_level entry are mounted into the Pod at path /etc/config/log_level. Note that this path is derived from the volume's mountPath and the path keyed with log_level.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-pod
+spec:
+  containers:
+    - name: test
+      image: busybox:1.28
+      volumeMounts:
+        - name: config-vol
+          mountPath: /etc/config
+  volumes:
+    - name: config-vol
+      configMap:
+        name: log-config
+        items:
+          - key: log_level
+            path: log_level
+```
+
+- You must create a ConfigMap before you can use it.
+- A container using a ConfigMap as a subPath volume mount will not receive ConfigMap updates.
+- Text data is exposed as files using the UTF-8 character encoding. For other character encodings, use `binaryData`.
+
+#### Out-of-tree volume plugins
+
+The out-of-tree volume plugins include Container Storage Interface (CSI), and also FlexVolume (which is deprecated). These plugins enable storage vendors to create custom storage plugins without adding their plugin source code to the Kubernetes repository.
+
+Previously, all volume plugins were "in-tree". The "in-tree" plugins were built, linked, compiled, and shipped with the core Kubernetes binaries. This meant that adding a new storage system to Kubernetes (a volume plugin) required checking code into the core Kubernetes code repository.
+
+Both CSI and FlexVolume allow volume plugins to be developed independent of the Kubernetes code base, and deployed (installed) on Kubernetes clusters as extensions.
+
+##### `csi`
+
+Container Storage Interface (CSI) defines a standard interface for container orchestration systems (like Kubernetes) to expose arbitrary storage systems to their container workloads.
+
+Once a CSI compatible volume driver is deployed on a Kubernetes cluster, users may use the csi volume type to attach or mount the volumes exposed by the CSI driver.
+
+A csi volume can be used in a Pod in three different ways:
+
+- through a reference to a PersistentVolumeClaim
+- with a generic ephemeral volume
+- with a CSI ephemeral volume if the driver supports
 
 #### Persistent Volumes
+
+Managing storage is a distinct problem from managing compute instances. The PersistentVolume subsystem provides an API for users and administrators that abstracts details of how storage is provided from how it is consumed. To do this, we introduce two new API resources: `PersistentVolume` and `PersistentVolumeClaim`.
+
+- A `PersistentVolume` (PV) is a piece of storage in the cluster that has been provisioned by an administrator or dynamically provisioned using Storage Classes. It is a resource in the cluster just like a node is a cluster resource. PVs are volume plugins like Volumes, but have a lifecycle independent of any individual Pod that uses the PV. This API object captures the details of the implementation of the storage, be that NFS, iSCSI, or a cloud-provider-specific storage system.
+- A `PersistentVolumeClaim` (PVC) is a request for storage by a user. It is similar to a Pod. Pods consume node resources and PVCs consume PV resources. Pods can request specific levels of resources (CPU and Memory). Claims can request specific size and access modes (e.g., they can be mounted ReadWriteOnce, ReadOnlyMany or ReadWriteMany, see AccessModes).
+
+While PersistentVolumeClaims allow a user to consume abstract storage resources, it is common that users need PersistentVolumes with varying properties, such as performance, for different problems. Cluster administrators need to be able to offer a variety of PersistentVolumes that differ in more ways than size and access modes, without exposing users to the details of how those volumes are implemented. For these needs, there is the StorageClass resource.
 
 These are Pod and Node independent Volumes that data persist regardless of Pod existence.
 
@@ -208,6 +348,173 @@ Persistent Volume Claim are created in a Pod that can reach out to stand-alone P
   - Volume is a standalone Cluster resource (not attached to a Pod or Node)
   - Created standalone, claimed via a PVC
   - Can be defined once and used multiple times
+
+### Environment variables
+
+#### ConfigMaps
+
+A ConfigMap is an API object used to store non-confidential data in key-value pairs. Pods can consume ConfigMaps as environment variables, command-line arguments, or as configuration files in a volume.
+
+A ConfigMap allows you to decouple environment-specific configuration from your container images, so that your applications are easily portable.
+
+> Caution: ConfigMap does not provide secrecy or encryption. If the data you want to store are confidential, use a Secret rather than a ConfigMap, or use additional (third party) tools to keep your data private.
+
+A ConfigMap is an API object that lets you store configuration for other objects to use. Unlike most Kubernetes objects that have a spec, a ConfigMap has data and binaryData fields. These fields accept key-value pairs as their values. Both the data field and the binaryData are optional. The data field is designed to contain UTF-8 strings while the binaryData field is designed to contain binary data as base64-encoded strings.
+
+Here's an example ConfigMap that has some keys with single values, and other keys where the value looks like a fragment of a configuration format.
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: game-demo
+data:
+  # property-like keys; each key maps to a simple value
+  player_initial_lives: "3"
+  ui_properties_file_name: "user-interface.properties"
+
+  # file-like keys
+  game.properties: |
+    enemy.types=aliens,monsters
+    player.maximum-lives=5    
+  user-interface.properties: |
+    color.good=purple
+    color.bad=yellow
+    allow.textmode=true    
+```
+
+There are four different ways that you can use a ConfigMap to configure a container inside a Pod:
+
+- Inside a container command and args
+- Environment variables for a container
+- Add a file in read-only volume, for the application to read
+- Write code to run inside the Pod that uses the Kubernetes API to read a ConfigMap
+
+Here's an example Pod that uses values from game-demo to configure a Pod:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-demo-pod
+spec:
+  containers:
+    - name: demo
+      image: alpine
+      command: ["sleep", "3600"]
+      env:
+        # Define the environment variable
+        - name: PLAYER_INITIAL_LIVES # Notice that the case is different here
+                                     # from the key name in the ConfigMap.
+          valueFrom:
+            configMapKeyRef:
+              name: game-demo           # The ConfigMap this value comes from.
+              key: player_initial_lives # The key to fetch.
+        - name: UI_PROPERTIES_FILE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: game-demo
+              key: ui_properties_file_name
+      volumeMounts:
+      - name: config
+        mountPath: "/config"
+        readOnly: true
+  volumes:
+    # You set volumes at the Pod level, then mount them into containers inside that Pod
+    - name: config
+      configMap:
+        # Provide the name of the ConfigMap you want to mount.
+        name: game-demo
+        # An array of keys from the ConfigMap to create as files
+        items:
+        - key: "game.properties"
+          path: "game.properties"
+        - key: "user-interface.properties"
+          path: "user-interface.properties"
+```
+
+#### Secrets
+
+A Secret is an object that contains a small amount of sensitive data such as a password, a token, or a key. Such information might otherwise be put in a Pod specification or in a container image. Using a Secret means that you don't need to include confidential data in your application code.
+
+Because Secrets can be created independently of the Pods that use them, there is less risk of the Secret (and its data) being exposed during the workflow of creating, viewing, and editing Pods. Kubernetes, and applications that run in your cluster, can also take additional precautions with Secrets, such as avoiding writing secret data to nonvolatile storage.
+
+Secrets are similar to ConfigMaps but are specifically intended to hold confidential data.
+
+Secret config files should be gitignored.
+
+How to create secrets?
+
+- Command line
+- Generator
+- Configuration file:
+A config file in YAML/JSON that has two data maps: `data` adn `stringData`. `data` requires values to be encoded in base64 whereas the `stringData` allows to provide values as plain strings (they will be encoded for you on create/update).
+
+To encode a string in base64 in terminal run `$ echo -n 'my-string' | base64`
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: example-app
+type: Opaque
+data:
+  app-user: YWRtaW5pc3RyYXRvcg==
+  app-password: cGFzc3dvcmQ=
+stringData:
+  Dbconnection:
+  Server=tcp:myserver.database.net,1433;Database=myDB;User ID=mylogin@myserver;Password=myPassword;Trusted_Connection=False;Encrypt=True;
+  config.yaml: |-
+        LogLevel: Warning
+        API_TOKEN: NcNIMcMYMAMg.MGwjPnPfEBgqMl8Q
+        API_URI: https://www.myapp.com/api
+```
+
+How to access secrets?
+
+- As container environment variable.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: myapp
+    image: ubuntu
+    env:
+      - name: PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: mysecret
+            key: password
+```
+
+- As files in a volume mounted on one or more of its containers.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: myapp
+    image: ubuntu
+    volumeMounts:
+      - name: secrets
+      mountPath: "/etc/secrets"
+      readOnly: true
+volumes:
+  - name: secrets
+  secret:
+    secretName: mysecret
+    defaultMode: 0400
+    items:
+      - key: username
+      path: my-username
+```
 
 ### Kubernetes Network
 

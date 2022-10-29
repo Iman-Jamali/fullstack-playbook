@@ -19,9 +19,6 @@ services:
       TODO_DB_POSTGRES_PASSWORD: ${TODO_DB_POSTGRES_PASSWORD}
       TODO_DB_POSTGRES_HOST: ${TODO_DB_POSTGRES_HOST}
       TODO_API_PORT: ${TODO_API_PORT}
-      TODO_API_PREFIX: ${TODO_API_PREFIX}
-      TODO_FE_HOST: ${TODO_FE_HOST}
-      TODO_FE_PORT: ${TODO_FE_PORT}
       TODO_API_JWT_SECRET: ${TODO_API_JWT_SECRET}
   todo-fe:
     container_name: todo-fe
@@ -29,11 +26,11 @@ services:
       context: ./todo-fe
       dockerfile: Dockerfile.local
     environment:
-      REACT_APP_TODO_API_BASE_URL: ${TODO_API_HOST}:${TODO_API_PORT}${TODO_API_PREFIX}
+      REACT_APP_TODO_API_BASE_URL: ${TODO_API_HOST}:${TODO_API_PORT}
       REACT_APP_JWT_SECRET: ${TODO_API_JWT_SECRET}
       NODE_ENV: ${NODE_ENV:-local}
     ports: 
-      - ${TODO_FE_PORT}:3000
+      - 3000:3000
     volumes: 
       - ./todo-fe:/app
       - /app/node_modules

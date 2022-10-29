@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-fe-service
+spec:
+  selector:
+    app: todo-fe
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-fe-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-fe
+  template:
+    metadata:
+      labels:
+        app: todo-fe
+    spec:
+      containers:
+        - name: todo-fe-container
+          image: imanjamali/todo-fe:latest
+          volumeMounts:
+            - name: todo-fe-secret
+              readOnly: true
+              mountPath: "/usr/share/nginx/html/config"
+      volumes:
+        - name: todo-fe-secret
+          secret:
+            secretName: todo-fe-secret

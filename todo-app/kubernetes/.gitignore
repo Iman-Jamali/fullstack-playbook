@@ -1,0 +1,2 @@
+# Ignore kubernetes secret files
+*.secret.*
