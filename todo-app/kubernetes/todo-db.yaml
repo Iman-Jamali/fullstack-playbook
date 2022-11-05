@@ -45,9 +45,14 @@ spec:
                   name: todo-secret
                   key: TODO_DB_POSTGRES_PASSWORD
           volumeMounts:
-            - name: todo-storage
+            # - name: todo-storage
+            #   mountPath: "/var/lib/postgresql/data"
+            - name: todo-db-efs-vol
               mountPath: "/var/lib/postgresql/data"
       volumes:
-        - name: todo-storage
+        # - name: todo-storage
+        #   persistentVolumeClaim:
+        #     claimName: todo-pvc-local
+        - name: todo-db-efs-vol
           persistentVolumeClaim:
-            claimName: todo-pvc-local
+            claimName: todo-db-efs-pvc

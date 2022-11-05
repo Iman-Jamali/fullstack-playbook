@@ -1,6 +1,7 @@
 # @baseUrl = http://localhost:5001/api/v1
 # @baseUrl = http://todo-app-load-balancer-658959564.us-west-2.elb.amazonaws.com/api/v1
-@baseUrl = http://127.0.0.1:56647/api/v1
+@baseUrl = http://a2ba6365fac284e1487136335b3395f6-152246349.us-west-2.elb.amazonaws.com
+# @baseUrl = http://127.0.0.1:56647/api/v1
 
 ###
 # Health check
@@ -11,7 +12,7 @@ POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-  "email": "u1.l@mail.com",
+  "email": "u1.d@mail.com",
   "password": "password1aB"
 }
 
@@ -21,7 +22,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "u1.l@mail.com",
+  "email": "u1.d@mail.com",
   "password": "password1aB"
 }
 ###
