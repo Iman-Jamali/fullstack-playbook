@@ -31,28 +31,28 @@ spec:
           env:
             - name: POSTGRES_DB
               valueFrom:
-                configMapKeyRef:
-                  name: todo-configmap
+                secretKeyRef:
+                  name: todo-db-secret
                   key: TODO_DB_POSTGRES_DATABASE
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: todo-secret
+                  name: todo-db-secret
                   key: TODO_DB_POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: todo-secret
+                  name: todo-db-secret
                   key: TODO_DB_POSTGRES_PASSWORD
           volumeMounts:
-            # - name: todo-storage
-            #   mountPath: "/var/lib/postgresql/data"
-            - name: todo-db-efs-vol
+            - name: todo-db-local
               mountPath: "/var/lib/postgresql/data"
+            # - name: todo-db-aws-efs
+            #   mountPath: "/var/lib/postgresql/data"
       volumes:
-        # - name: todo-storage
-        #   persistentVolumeClaim:
-        #     claimName: todo-pvc-local
-        - name: todo-db-efs-vol
+        - name: todo-db-local
           persistentVolumeClaim:
-            claimName: todo-db-efs-pvc
+            claimName: todo-pvc-local
+        # - name: todo-db-aws-efs
+        #   persistentVolumeClaim:
+        #     claimName: todo-db-pvc-aws-efs
