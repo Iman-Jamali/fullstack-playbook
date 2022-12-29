@@ -1,6 +1,24 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: [push]
+name: Example
+
+# on: [push]
+
+on:
+  push:
+    # branches: [ main ]
+    # paths:
+    #   - "forms-flow-web/**"
+    #   - "deployment/openshift/web_bc.yaml"
+    #   - "deployment/openshift/web_dc.yaml" 
+  workflow_dispatch:
+    inputs:
+      file-path: # id of input
+        description: "Path to test script"
+        required: true
+        default: "test-file.js"
+    outputs:
+    results-file: # id of output
+      description: "Path to results file"
+
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
