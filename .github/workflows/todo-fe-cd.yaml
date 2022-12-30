@@ -1,0 +1,74 @@
+name: todo-fe-cd
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+        - dev
+        - production
+  push:
+    branches: [ main ]
+    paths:
+      - "todo-app/todo-fe/**"
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+  DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN}}
+  ENVIRONMENT: ${{ !github.event.inputs.environment && 'dev' ||  github.event.inputs.environment }}
+  BRANCH: ${{ github.ref_name }}
+  DOCKER_FILE_NAME: Dockerfile.prod
+  PROJECT_NAME: todo-app
+  APP_NAME: todo-fe
+
+jobs:
+  # Logs environment variables
+  Print-envs:
+    name: Print environment variables
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print environment variables
+        run: |
+          echo DOCKER_HUB_USERNAME: $DOCKER_HUB_USERNAME
+          echo DOCKER_HUB_ACCESS_TOKEN: $DOCKER_HUB_ACCESS_TOKEN
+          echo ENVIRONMENT: $ENVIRONMENT
+          echo BRANCH: $BRANCH
+          echo DOCKER_FILE_NAME: $DOCKER_FILE_NAME
+          echo PROJECT_NAME: $PROJECT_NAME
+          echo APP_NAME: $APP_NAME
+  
+  ##################################### Build and push Image #####################################
+  build-and-push-image:
+    name: Build the image and push it to the registry
+    if: github.repository == 'Iman-Jamali/fullstack-playbook'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: ${{ env.PROJECT_NAME }}/${{ env.APP_NAME }}
+          push: true
+          tags: ${{ env.DOCKER_HUB_USERNAME }}/${{ env.APP_NAME }}:${{ env.ENVIRONMENT }}
+          file: ${{ env.PROJECT_NAME }}/${{ env.APP_NAME }}/${{ env.DOCKER_FILE_NAME }}
+
