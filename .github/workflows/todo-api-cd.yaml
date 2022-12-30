@@ -26,7 +26,6 @@ env:
   ENVIRONMENT: ${{ !github.event.inputs.environment && 'dev' ||  github.event.inputs.environment }}
   BRANCH: ${{ github.ref_name }}
   DOCKER_FILE_NAME: Dockerfile.prod
-  REPO_NAME: Iman-Jamali/fullstack-playbook
   PROJECT_NAME: todo-app
   APP_NAME: todo-api
 
@@ -43,15 +42,13 @@ jobs:
           echo ENVIRONMENT: $ENVIRONMENT
           echo BRANCH: $BRANCH
           echo DOCKER_FILE_NAME: $DOCKER_FILE_NAME
-          echo REPO_NAME: $REPO_NAME
           echo PROJECT_NAME: $PROJECT_NAME
           echo APP_NAME: $APP_NAME
   
   ##################################### Build and push Image #####################################
   build-and-push-image:
     name: Build the image and push it to the registry
-    # if: github.repository == "${{ env.REPO_NAME }}"
-    if: github.repository == env.REPO_NAME
+    if: github.repository == Iman-Jamali/fullstack-playbook
     runs-on: ubuntu-latest
 
     steps:
