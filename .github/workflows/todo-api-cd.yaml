@@ -12,9 +12,9 @@ on:
         - dev
         - production
   push:
-    # branches: [ main ]
-    # paths:
-      # - "todo-app/todo-api/**"
+    branches: [ main ]
+    paths:
+      - "todo-app/todo-api/**"
 
 defaults:
   run:
