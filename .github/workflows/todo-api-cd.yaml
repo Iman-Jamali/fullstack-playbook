@@ -50,7 +50,7 @@ jobs:
   ##################################### Build and push Image #####################################
   build-and-push-image:
     name: Build the image and push it to the registry
-    if: github.repository == ${{ env.REPO_NAME }}
+    if: github.repository == $REPO_NAME
     runs-on: ubuntu-latest
 
     steps:
