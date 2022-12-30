@@ -70,5 +70,5 @@ jobs:
           context: ${{ env.PROJECT_NAME }}/${{ env.APP_NAME }}
           push: true
           tags: ${{ env.DOCKER_HUB_USERNAME }}/${{ env.APP_NAME }}:${{ env.ENVIRONMENT }}
-          file: ${{ env.APP_NAME }}/${{ env.DOCKER_FILE_NAME }}
+          file: ${{ env.PROJECT_NAME }}/${{ env.APP_NAME }}/${{ env.DOCKER_FILE_NAME }}
 
