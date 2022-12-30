@@ -51,3 +51,17 @@ You can write your own actions, or you can find actions to use in your workflows
 ### Runners
 
 A runner is a server that runs your workflows when they're triggered. Each runner can run a single job at a time. GitHub provides Ubuntu Linux, Microsoft Windows, and macOS runners to run your workflows; each workflow run executes in a fresh, newly-provisioned virtual machine. GitHub also offers larger runners, which are available in larger configurations. For more information, see "Using larger runners." If you need a different operating system or require a specific hardware configuration, you can host your own runners.
+
+### Essentials
+
+#### [Expression](https://docs.github.com/en/actions/learn-github-actions/expressions)
+
+#### [Contexts](https://docs.github.com/en/actions/learn-github-actions/contexts)
+
+#### [Environment variables](https://docs.github.com/en/actions/learn-github-actions/environment-variables)
+
+### [Continuos Integration](https://docs.github.com/en/actions/automating-builds-and-tests/about-continuous-integration)
+
+### [Continuous Deployment](https://docs.github.com/en/actions/deployment/about-deployments/about-continuous-deployment)
+
+#### [Target Different environments for deployment](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment)
