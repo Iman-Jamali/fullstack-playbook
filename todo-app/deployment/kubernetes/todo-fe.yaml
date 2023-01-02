@@ -7,9 +7,9 @@ spec:
     app: todo-fe
   type: LoadBalancer
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
+  - protocol: TCP
+    port: 80
+    targetPort: 80
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -26,13 +26,13 @@ spec:
         app: todo-fe
     spec:
       containers:
-        - name: todo-fe-container
-          image: imanjamali/todo-fe:latest
-          volumeMounts:
-            - name: todo-fe-secret
-              readOnly: true
-              mountPath: "/usr/share/nginx/html/config"
-      volumes:
+      - name: todo-fe-container
+        image: imanjamali/todo-fe:latest
+        volumeMounts:
         - name: todo-fe-secret
-          secret:
-            secretName: todo-fe-secret
+          readOnly: true
+          mountPath: "/usr/share/nginx/html/config"
+      volumes:
+      - name: todo-fe-secret
+        secret:
+          secretName: todo-fe-secret

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: todo-api-pod
+  labels:
+    app: todo-api-pod
+spec:
+  containers:
+  - env:
+    - name: MESSAGE
+      value: Hi.
+    image: todo-api
+    imagePullPolicy: Always
+    name: todo-api
+    resources: {}
+  dnsPolicy: ClusterFirst
+  nodeName: localhost
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
