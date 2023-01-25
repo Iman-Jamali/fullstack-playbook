@@ -121,7 +121,9 @@ OpenShift uses concept of projects to divide up applications. It also allow Open
 
 OpenShift uses project to group together related resources. What those resources are will depend on your application (e.g., fe, backend server, database and etc).
 
-[OC project-related documentation](https://docs.openshift.com/container-platform/4.11/cli_reference/openshift_cli/getting-started-cli.html#creating-a-project)
+[OC project-related documentation: creating a project](https://docs.openshift.com/container-platform/4.11/cli_reference/openshift_cli/getting-started-cli.html#creating-a-project)
+
+[OC project-related documentation: working with projects](https://docs.openshift.com/container-platform/4.11/applications/projects/working-with-projects.html)
 
 ```bash
 #---- Project-related commands in OpenShift CLI----
@@ -148,6 +150,8 @@ Pods are the rough equivalent of a machine instance (physical or virtual) to a C
 Pods have a lifecycle; they are defined, then they are assigned to run on a node, then they run until their container(s) exit or they are removed for some other reason. Pods, depending on policy and exit code, might be removed after exiting, or can be retained to enable access to the logs of their containers.
 
 OpenShift Container Platform treats pods as largely immutable; changes cannot be made to a pod definition while it is running. OpenShift Container Platform implements changes by terminating an existing pod and recreating it with modified configuration, base image(s), or both. Pods are also treated as expendable, and do not maintain state when recreated. Therefore pods should usually be managed by higher-level controllers, rather than directly by users.
+
+### DeploymentConfigs
 
 ## OpenShift CLI commands
 
