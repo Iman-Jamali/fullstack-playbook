@@ -1,8 +1,14 @@
-FROM node:16.16.0-buster
+FROM node:18
 WORKDIR /app
 COPY ["package.json", "package-lock.json*", "./"]
 RUN npm install --production
 COPY . .
 RUN npm run build
-EXPOSE 80
+# Fixes the permission issue with node on OpenShift
+RUN mkdir /.npm && \
+    chgrp -R root /.npm && \
+    chmod -R 770 /.npm
+EXPOSE 5001
 CMD [ "npm", "run", "start:prod"]
+
+

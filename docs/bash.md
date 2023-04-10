@@ -24,3 +24,12 @@ echo aW1hbgo= | base64 --decode
 
 
 ### linux echo command
+
+
+### How to add a binary file to your `PATH` in zsh:
+
+You can have a `bin` directory in your home that is in your `PATH` and then add all the binary files to that directory to have them all accessible throughout the terminal.
+
+1. `mkdir ~/bin`
+2. Open your `~/.zshrc` file and add this line at the end. `export PATH=$PATH:$HOME/bin`
+3. Move your binary files to this directory (`~/bin`) to have them accessible throughout your terminal.

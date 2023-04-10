@@ -1,11 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: todo-db-pvc-aws-efs
+  name: todo-db-pvc
 spec:
+  storageClassName: gp2
+  volumeMode: Filesystem
   accessModes:
-    - ReadWriteMany
-  storageClassName: efs-sc
+  - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
