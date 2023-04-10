@@ -1,0 +1,85 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: todo-api-route
+  labels: 
+    app: todo-api
+spec:
+  subdomain: todo-api-dev
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: todo-api-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-api-service
+  labels: 
+    app: todo-api
+spec:
+  selector:
+    app: todo-api
+  ports:
+  - protocol: TCP
+    port: 5001
+    targetPort: 5001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-api-deployment
+  labels:
+    app: todo-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-api
+  template:
+    metadata:
+      labels:
+        app: todo-api
+    spec:
+      containers:
+      - name: todo-api-container
+        image: imanjamali/todo-api:latest
+        ports:
+          - containerPort: 5001
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            secretKeyRef:
+              name: todo-api-secret
+              key: NODE_ENV
+        - name: TODO_DB_POSTGRES_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: todo-db-secret
+              key: TODO_DB_POSTGRES_DATABASE
+        - name: TODO_DB_POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: todo-db-secret
+              key: TODO_DB_POSTGRES_USER
+        - name: TODO_DB_POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: todo-db-secret
+              key: TODO_DB_POSTGRES_PASSWORD
+        - name: TODO_DB_POSTGRES_HOST
+          valueFrom:
+            secretKeyRef:
+              name: todo-db-secret
+              key: TODO_DB_POSTGRES_HOST
+        - name: TODO_API_PORT
+          valueFrom:
+            secretKeyRef:
+              name: todo-api-secret
+              key: TODO_API_PORT
+        - name: TODO_API_JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: todo-api-secret
+              key: TODO_API_JWT_SECRET

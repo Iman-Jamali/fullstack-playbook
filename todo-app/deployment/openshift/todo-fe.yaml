@@ -1,0 +1,57 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: todo-fe-route
+  labels: 
+    app: todo-api
+spec:
+  subdomain: todo-fe-dev
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: todo-fe-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-fe-service
+  labels:
+    app: todo-fe
+spec:
+  selector:
+    app: todo-fe
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-fe-deployment
+  labels:
+    app: todo-fe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-fe
+  template:
+    metadata:
+      labels:
+        app: todo-fe
+    spec:
+      containers:
+      - name: todo-fe-container
+        image: imanjamali/todo-fe:latest
+        ports:
+          - containerPort: 8080
+        volumeMounts:
+        - name: todo-fe-volume
+          readOnly: true
+          mountPath: "/usr/share/nginx/html/config"
+      volumes:
+      - name: todo-fe-volume
+        secret:
+          secretName: todo-fe-secret
